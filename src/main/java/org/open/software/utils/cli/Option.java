@@ -4,12 +4,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * internal representation of program option
+ * 
+ * @author andriyv
+ *
+ */
 class Option {
 	private String name;
 	private boolean complete;
 	private String[] values;
 
-	public Option(String value) {
+	/**
+	 * Instantiates a new option.
+	 *
+	 * @param value the value
+	 */
+	Option(String value) {
 
 		int i = value.indexOf("=");
 		if (i != -1) {
@@ -20,7 +31,12 @@ class Option {
 		}
 	}
 
-	public void set(String o) {
+	/**
+	 * Sets the option
+	 *
+	 * @param o the o
+	 */
+	void set(String o) {
 		List<String> valuesList = new ArrayList<>();
 		
 		while(o.isEmpty() == false) {
@@ -53,7 +69,16 @@ class Option {
 		complete = true;
 	}
 
-	public <T> T get(Class<T> type, String value) {
+	/**
+	 * Gets the option with generic type
+	 *
+	 * @param <T> the generic type
+	 * @param type the type
+	 * @param value the value
+	 * 
+	 * @return the t value of option or null
+	 */
+	private <T> T get(Class<T> type, String value) {
 
 		if (Boolean.class.equals(type)) {
 			return type.cast(((value == null) || Boolean.valueOf(value)));
@@ -77,11 +102,25 @@ class Option {
 		return null;
 	}
 	
-	public <T> T get(Class<T> type) {
+	/**
+	 * Gets the.
+	 *
+	 * @param <T> the generic type
+	 * @param type the type
+	 * @return the t
+	 */
+	<T> T get(Class<T> type) {
 		return get(type, values != null ? values[0] : null);
 	}
 	
-	public <T> List<T> list(Class<T> type) {
+	/**
+	 * List.
+	 *
+	 * @param <T> the generic type
+	 * @param type the type
+	 * @return the list
+	 */
+	<T> List<T> list(Class<T> type) {
 		List<T> result = new ArrayList<>();
 		Arrays.asList(values).stream().forEach(c -> {
 			try {

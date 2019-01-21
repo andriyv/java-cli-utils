@@ -53,7 +53,7 @@ public class Options {
 	private List<Option> optionList;
 
 	public Options(String[] options) {
-		this.optionList = new ArrayList();
+		this.optionList = new ArrayList<>();
 
 		Arrays.asList(options).forEach(o -> {
 
@@ -79,16 +79,38 @@ public class Options {
 		});
 	}
 
+	/**
+	 * Checks if option defined
+	 *
+	 * @param optionName the option name
+	 * @return true, if successful
+	 */
 	public boolean has(String optionName) {
 		return optionList.stream().anyMatch(c -> c.getName().equals(optionName));
 	}
 
+	/**
+	 * Gets the option value. If multiple values exists the first matching one will be returned
+	 *
+	 * @param <T> the generic type
+	 * @param optionName the option name
+	 * @param optionType the option type
+	 * @return the t
+	 */
 	public <T> T get(String optionName, Class<T> optionType) {
 		return optionList.stream().filter(o -> o.getName().equals(optionName)).filter(o -> {
 			return o.get(optionType) != null;
 		}).map(o -> o.get(optionType)).findFirst().orElse(null);
 	}
 
+	/**
+	 * List the matching option values for the type
+	 *
+	 * @param <T> the generic type
+	 * @param optionName the option name
+	 * @param optionType the option type
+	 * @return the list
+	 */
 	public <T> List<T> list(String optionName, Class<T> optionType) {
 		return optionList.stream().filter(o -> o.getName().equals(optionName)).flatMap(o -> {
 			List<T> list = o.list(optionType);
