@@ -9,10 +9,10 @@ The Options allows to handle java programm arguments. It parses String[] args, a
 public void static main(String[] args) {
   Options options = new Options(args);
   
-  if(option.has("A")) {
+  if(options.has("A")) {
   }
   
-  String argumentB = option.get("B", String.value);
-  List<Integer> argumentsC = option.list("C", Integer.value);
+  String argumentB = options.get("B", String.value);
+  List<Integer> argumentsC = options.list("C", Integer.value);
 }
 ~~~~
