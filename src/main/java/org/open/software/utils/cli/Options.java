@@ -3,6 +3,8 @@ package org.open.software.utils.cli;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,7 +88,9 @@ public class Options {
 	 * @return true, if successful
 	 */
 	public boolean has(String optionName) {
-		return optionList.stream().anyMatch(c -> c.getName().equals(optionName));
+		List<String> optionNames = Arrays.asList(optionName.split("\\?"));
+		
+		return optionList.stream().anyMatch(c -> optionNames.contains(c.getName()));
 	}
 
 	/**
@@ -98,10 +102,25 @@ public class Options {
 	 * @return the t
 	 */
 	public <T> T get(String optionName, Class<T> optionType) {
-		return optionList.stream().filter(o -> o.getName().equals(optionName)).filter(o -> {
-			return o.get(optionType) != null;
-		}).map(o -> o.get(optionType)).findFirst().orElse(null);
+		return get(optionName, optionType, (f) -> true);
 	}
+	
+	/**
+	 * Gets the option value with predicate. If multiple values exists the first matching one will be returned
+	 * 
+	 * @param optionName
+	 * @param optionType
+	 * @param predicateFilter
+	 * @return
+	 */
+	public <T> T get(String optionName, Class<T> optionType, Predicate<T> predicateFilter) {
+		List<String> optionNames = Arrays.asList(optionName.split("\\?"));
+		
+		return optionList.stream().filter(o -> optionNames.contains(o.getName())).filter(o -> {
+			return o.get(optionType) != null;
+		}).map(o -> o.get(optionType)).filter(predicateFilter).findFirst().orElse(null);
+	}
+	
 
 	/**
 	 * List the matching option values for the type
@@ -112,9 +131,24 @@ public class Options {
 	 * @return the list
 	 */
 	public <T> List<T> list(String optionName, Class<T> optionType) {
-		return optionList.stream().filter(o -> o.getName().equals(optionName)).flatMap(o -> {
+		return list(optionName, optionType, f -> true);
+	}
+	
+	/**
+	 * List with predicate
+	 *
+	 * @param <T> the generic type
+	 * @param optionName the option name
+	 * @param optionType the option type
+	 * @param predicateFilter the filter
+	 * @return the list
+	 */
+	public <T> List<T> list(String optionName, Class<T> optionType, Predicate<T> predicateFilter) {
+		List<String> optionNames = Arrays.asList(optionName.split("\\?"));
+		
+		return optionList.stream().filter(o -> optionNames.contains(o.getName())).flatMap(o -> {
 			List<T> list = o.list(optionType);
 			return (Stream<T>)(list != null ? list.stream() : new ArrayList().stream());
-		}).collect(Collectors.toList());
+		}).filter(predicateFilter).collect(Collectors.toList());
 	}
 }

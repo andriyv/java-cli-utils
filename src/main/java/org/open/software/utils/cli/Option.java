@@ -1,5 +1,8 @@
 package org.open.software.utils.cli;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,6 +99,16 @@ class Option {
 			}
 			if (Double.class.isAssignableFrom(type)) {
 				return (T) Double.valueOf(value);
+			}
+			
+			// finally try string based constructor
+			try {
+				Constructor<T> stringConst = type.getConstructor(String.class);
+				if (stringConst != null ) {
+					return stringConst.newInstance(value);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("unable to create value of type " + type.getName(), e);
 			}
 		}
 

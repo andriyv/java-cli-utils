@@ -1,5 +1,6 @@
 package org.open.software.utils.cli;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.Assert;
@@ -29,6 +30,48 @@ public class OptionsTest {
 		Assert.assertEquals(new Integer(10), options.get("a", Integer.class));
 		Assert.assertEquals(new Long(10), options.get("a", Long.class));
 		Assert.assertEquals(new Float(10), options.get("a", Float.class));
+	}
+	
+	/**
+	 * Test options get.
+	 *
+	 * @throws Exception the exception
+	 */
+	@Test
+	public void testOptionsAliasesGet() throws Exception {
+
+		Options options = new Options(new String[] { "-a", "10", "-b", "-another", "Hello world" });
+
+		Assert.assertTrue(options.has("a"));
+		Assert.assertTrue(options.has("another"));
+		Assert.assertTrue(options.has("a?another"));
+		
+		Assert.assertEquals("10", options.get("a?another", String.class));
+		
+		List<String> s = options.list("a?another", String.class);
+		Assert.assertEquals(2, s.size());
+		
+	}
+	
+	/**
+	 * Test options get with predicate
+	 *
+	 * @throws Exception the exception
+	 */
+	@Test
+	public void testOptionsWithPredicate() throws Exception {
+
+		Options options = new Options(new String[] { "-a", "10", "-a", "12,25" });
+
+		Assert.assertTrue(options.has("a"));
+		
+
+		Assert.assertEquals(new Integer(12), options.get("a", Integer.class, (x) -> x > 10));
+		
+		List<Integer> list = options.list("a", Integer.class, (x) -> x < 20);
+		Assert.assertEquals(2, list.size());
+		Assert.assertTrue(list.contains(10));
+		Assert.assertTrue(list.contains(12));
 	}
 	
 	@Test
@@ -89,5 +132,25 @@ public class OptionsTest {
 		Assert.assertNotNull(aStrings);
 		Assert.assertEquals(6, aStrings.size());
 	}
+	
+	/**
+	 * Test options list.
+	 *
+	 * @throws Exception the exception
+	 */
+	@Test
+	public void testOptionsListOfFiles() throws Exception {
+
+		Options options = new Options(new String[] { "-a", "a.txt", "-a", "b.txt", "-a", "Hello world" });
+
+		List<File> list = options.list("a", File.class);
+		
+		Assert.assertEquals(3, list.size());
+		
+		List<File> existingList = options.list("a", File.class, (d) -> d.exists());
+	
+		Assert.assertTrue(existingList.isEmpty());
+	}
+	
 
 }
